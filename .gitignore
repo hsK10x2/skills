@@ -1,8 +1,9 @@
-# This repo only tracks the commit-and-pr skill.
-# Everything else in ~/.claude/skills is a separately-managed/bundled skill.
+# Track custom agent skills
 *
-!commit-and-pr/
-!commit-and-pr/**
 !README.md
 !LICENSE
 !.gitignore
+!commit-and-pr/
+!commit-and-pr/**
+!explain-code/
+!explain-code/**

@@ -1,53 +1,80 @@
-# commit-and-pr
+# Agent Skills Collection
 
-An [Agent Skill](https://docs.claude.com/en/docs/claude-code/skills) that
-automates writing git commit messages and opening GitHub pull requests.
+A collection of custom [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) for **Claude Code** and **Google Antigravity**.
 
-Point it at a dirty working tree and it will:
+Designed to streamline development workflows, automate Git operations, and generate high-density documentation for learning and maintaining code.
 
-1. Read `git status` / `git diff` to understand *why* the change was made
-2. Draft a [Conventional Commits](https://www.conventionalcommits.org/) message
-3. Commit (creating a feature branch first if you're on `main`/`master`)
-4. Push
-5. Open a PR via `gh pr create` with a Summary / Changes / Test Plan body
+---
 
-It asks before anything hard-to-reverse (force-push, amending a pushed
-commit, merging, committing straight to the default branch) and refuses to
-commit if it spots secrets in the diff.
+## 📦 Included Skills
 
-Works with any agent that supports the Agent Skills format — built and
-tested with **Claude Code**; also compatible with **Google Antigravity**.
+| Skill | Description | Triggers |
+| :--- | :--- | :--- |
+| **[`commit-and-pr`](./commit-and-pr)** | Inspects working-tree changes, drafts Conventional Commits messages, commits, pushes, and opens GitHub PRs via `gh`. | `/commit-and-pr`, `커밋해줘`, `PR 만들어줘` |
+| **[`explain-code`](./explain-code)** | Generates high-density, junior-developer-friendly Markdown explanation documents (`<file>.explain.md` / `EXPLAIN.md`) for code study and maintenance. | `/explain-code`, `이 코드 설명해줘`, `코드 설명 md 만들어줘` |
 
-## Install
+---
 
-**Claude Code** — clone anywhere, then copy the `commit-and-pr/` folder into
-your skills directory:
+## 🚀 Installation
+
+Works with any AI agent supporting the open Agent Skills standard (`SKILL.md`).
+
+### Claude Code
+
+Clone this repository and copy the desired skill(s) into your Claude skills folder:
 
 ```bash
-git clone https://github.com/hsK10x2/commit-and-pr /tmp/commit-and-pr
+git clone https://github.com/hsK10x2/commit-and-pr.git /tmp/my-skills
 
-# per-user (all projects)
-cp -r /tmp/commit-and-pr/commit-and-pr ~/.claude/skills/commit-and-pr
+# Install all skills globally (all projects)
+cp -r /tmp/my-skills/commit-and-pr ~/.claude/skills/
+cp -r /tmp/my-skills/explain-code ~/.claude/skills/
 
-# or per-project instead
-cp -r /tmp/commit-and-pr/commit-and-pr <project>/.claude/skills/commit-and-pr
+# Or install in a specific project
+cp -r /tmp/my-skills/<skill-name> <project>/.claude/skills/
 ```
 
-Then use it with `/commit-and-pr` or just ask naturally: "커밋해줘", "commit
-this and open a PR".
+### Google Antigravity
 
-**Google Antigravity** — copy `commit-and-pr/SKILL.md` into
-`~/.gemini/config/skills/commit-and-pr/SKILL.md` (global) or
-`<project>/.agents/skills/commit-and-pr/SKILL.md` (per-project). The agent
-picks it up automatically based on the `description` field; no restart
-needed for the CLI, next-session for the IDE.
+Copy the skill's `SKILL.md` to your Antigravity configuration directory:
 
-## Requirements
+```bash
+# Global installation (recommended)
+cp -r /tmp/my-skills/<skill-name> ~/.gemini/config/skills/
 
-- `git`
-- [`gh`](https://cli.github.com/) (GitHub CLI), authenticated — only needed
-  for the PR step
+# Or per-project installation
+cp -r /tmp/my-skills/<skill-name> <project>/.agents/skills/
+```
+Antigravity automatically discovers and activates skills on the next turn or session.
 
-## License
+---
+
+## 📖 Skill Overviews
+
+### 1. `commit-and-pr`
+- Inspects `git status` and `git diff` to extract the *why* behind changes.
+- Formats messages in [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.).
+- Automatically creates a feature branch if on `main`/`master`.
+- Opens a structured GitHub PR using `gh pr create` (Summary / Changes / Test Plan).
+- Asks for confirmation before any destructive actions (force-push, amending pushed commits).
+
+### 2. `explain-code`
+- **Grounded & Concrete**: Maps explanations directly to function names, line numbers, and parameters.
+- **High Readability**: Replaces walls of text with structured tables and numbered steps.
+- **Educational (Study Focus)**: Includes **💡 Key Study Points** detailing core CS concepts (e.g., Concurrency, RLock, Lazy Evaluation, Factory Pattern) and architectural trade-offs.
+- **Professional Terminology**: Accurately explains engineering concepts for junior developers.
+- **Zero Fluff**: High-density format maximizing token efficiency.
+- **Automatic Scoping**: Outputs `<filename>.explain.md` for single files, and `EXPLAIN.md` for multi-file projects.
+
+---
+
+## 🛠️ Requirements
+
+- **`git`**
+- **`gh`** ([GitHub CLI](https://cli.github.com/)), authenticated — required for `commit-and-pr` PR creation.
+
+---
+
+## 📄 License
 
 MIT — see [LICENSE](LICENSE).
