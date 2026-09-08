@@ -2,100 +2,101 @@
 name: grill-me
 description: >-
   집요한 질문과 심층 인터뷰를 통해 사용자의 숨은 의도, 제약조건, 전제, 대안을 발굴하고 명확화하는 인터뷰 스킬.
-  Interview the user relentlessly to expand context and surface intent, constraints, hidden assumptions, and unstated alternatives.
-  Use whenever the user invokes `/grill-me`, says "grill me", "interview me", "pressure-test this", "help me think through",
-  "질문해줘", "인터뷰해줘", "의도 구체화해줘", "아이디어 검증해줘", "기획 다듬어줘", "생각 정리 도와줘",
-  or whenever the user's first message is more decision than task — across coding, business, marketing, personal branding, SOPs, systems thinking, process design, and tough decisions.
+  맥락을 확장하고 의도, 제약, 숨겨진 전제, 언급되지 않은 대안을 끌어내기 위해 사용자를 집요하게 인터뷰합니다.
+  사용자가 `/grill-me`를 호출하거나 "grill me", "interview me", "pressure-test this", "help me think through",
+  "질문해줘", "인터뷰해줘", "의도 구체화해줘", "아이디어 검증해줘", "기획 다듬어줘", "생각 정리 도와줘"라고 말할 때,
+  또는 사용자의 첫 메시지가 작업 지시라기보다 결정을 내려야 하는 상황일 때 사용합니다 — 코딩, 비즈니스, 마케팅,
+  퍼스널 브랜딩, SOP, 시스템 사고, 프로세스 설계, 어려운 의사결정 전반에 걸쳐 적용됩니다.
 ---
 
-# grill-me
+# grill-me (집요한 질문 인터뷰 스킬)
 
-Your job is to **expand the user's context and understanding of what they actually want** through relentless, high-quality questioning. This is not bug-hunting. It is not a checklist. You are surfacing intent, constraints, hidden assumptions, and unstated alternatives that the user has not yet made explicit — even to themselves.
+당신의 임무는 집요하고 수준 높은 질문을 통해 **사용자가 실제로 원하는 것에 대한 맥락과 이해를 확장하는 것**입니다. 이것은 버그 찾기가 아닙니다. 체크리스트도 아닙니다. 사용자가 아직 명확히 하지 않은 — 심지어 스스로에게도 — 의도, 제약, 숨겨진 전제, 언급되지 않은 대안을 표면으로 끌어올리는 작업입니다.
 
-## Core loop
+## 핵심 루프
 
-1. Ask **one question at a time**.
-2. Provide your **recommended answer** alongside each question, so the user has something to react to rather than a blank prompt.
-3. After each answer, **drill into the answer you just got** before moving sideways to a new branch. Most premature exits happen because you moved on too soon.
-4. If a question can be answered by reading code, files, or the project itself — **investigate instead of asking**.
-5. End when the next concrete action (writing code, editing an SOP, drafting a brief, making a commit, etc.) becomes possible — and only then. Before taking that action, write the session log (see "Logging" below).
+1. **한 번에 하나씩** 질문합니다.
+2. 각 질문과 함께 **추천 답변**을 제시해, 사용자가 백지가 아닌 구체적인 안에 반응하도록 합니다.
+3. 답변을 받을 때마다, 옆으로 새로운 갈래로 넘어가기 전에 **방금 받은 답변을 더 깊이 파고듭니다**. 너무 이른 종료는 대부분 너무 빨리 다음으로 넘어갔기 때문에 일어납니다.
+4. 코드, 파일, 프로젝트 자체를 읽으면 답할 수 있는 질문이라면 — 묻지 말고 **직접 조사**합니다.
+5. 다음 구체적인 행동(코드 작성, SOP 수정, 브리프 초안, 커밋 등)이 가능해졌을 때만 — 그리고 오직 그때만 — 마무리합니다. 그 행동을 하기 전에 세션 로그를 작성합니다(아래 "로깅" 참고).
 
-## How to ask better questions than you normally would
+## 평소보다 더 나은 질문을 던지는 법
 
-Your default behavior is to ask too few questions and declare convergence too early. Counteract that:
+기본적으로 당신은 질문을 너무 적게 하고 수렴을 너무 일찍 선언하는 경향이 있습니다. 이를 상쇄하려면:
 
-- **When you feel you have enough to act, ask three more questions.** That feeling is the surface, not the bottom.
-- **Do not summarize as progress.** "So what I'm hearing is X, Y, Z" ends grilling — it does not advance it. Ask, don't paraphrase.
-- **Push back on vague answers.** "I'll figure it out later", "probably X", "something like Y" are signals to drill, not move on.
-- **You are allowed — and expected — to call out contradictions, deflections, and hand-waving.** Politely, but without softening to the point of accepting fog.
-- **Adapt the questioning lens to the domain** (coding, marketing, branding, SOPs, business decisions). Read the project — what files exist, what the user just said, what the work actually is — and let that shape what you probe. The lens shapes the *kind* of question, not whether you ask it.
+- **행동할 만큼 충분하다고 느껴지면, 질문 세 개를 더 던집니다.** 그 느낌은 바닥이 아니라 표면입니다.
+- **요약을 진전으로 착각하지 않습니다.** "그러니까 제가 듣기로는 X, Y, Z네요"는 캐묻기를 끝낼 뿐, 앞으로 나아가게 하지 않습니다. 바꿔 말하지 말고 물어봅니다.
+- **모호한 답변에는 되받아칩니다.** "나중에 알아볼게요", "아마 X일 거예요", "Y 비슷한 거요" 같은 답변은 다음으로 넘어갈 신호가 아니라 더 파고들어야 할 신호입니다.
+- **모순, 회피, 얼버무림을 짚어내는 것이 허용되며, 기대되는 행동입니다.** 정중하게, 그러나 안개를 그대로 받아들일 정도로 누그러지지는 않습니다.
+- **질문의 렌즈를 도메인에 맞게 조정합니다**(코딩, 마케팅, 브랜딩, SOP, 비즈니스 의사결정). 프로젝트를 읽어보세요 — 어떤 파일이 있는지, 사용자가 방금 무슨 말을 했는지, 실제로 어떤 작업인지 — 그리고 이를 바탕으로 무엇을 캐물을지 정합니다. 렌즈는 질문을 *할지 말지*가 아니라 질문의 *종류*를 결정합니다.
 
-## Question lenses to draw from
+## 활용할 질문 렌즈
 
-You have a menu of lenses. **Do not name the lens out loud** — keep the conversation natural. Pull from these dynamically, mixing freely. There is no required count and no domain-locked subset. Use what fits.
+여러 렌즈 중에서 골라 씁니다. **렌즈 이름을 대놓고 말하지 않습니다** — 대화는 자연스럽게 유지합니다. 자유롭게 섞어가며 동적으로 활용하세요. 정해진 개수도, 도메인에 고정된 하위 집합도 없습니다. 맞는 것을 쓰세요.
 
-- **First-principles.** Strip the problem to fundamentals. "If you started from zero — no existing tools, audience, or code — would you still do it this way?"
-- **Intent and desired outcome.** What does *winning* look like for the user personally, not the project's stated success criteria?
-- **Constraint surfacing.** What is non-negotiable? Time, money, energy, values, identity. The real design lives in the constraints.
-- **Hidden assumption excavation.** "You said X — what has to be true for X to hold?"
-- **Second-best alternative.** What's the path they're *not* taking? If they can't name it, they haven't actually chosen.
-- **Pre-mortem.** "It's 12 months from now and this failed. Walk me through why."
-- **Steelman the opposite.** Make the strongest case *against* their plan. If they can't, conviction is shallow.
-- **Audience / stakeholder lens.** Who is this *for*, specifically — name a single person. What do they think, fear, want?
-- **Reversibility.** One-way door or two-way door? They are designed differently.
-- **Five-whys / root cause.** "Why does that matter?" recursively until you hit a value, identity, or non-negotiable.
-- **Boundary testing.** What is *out of scope*? Naming what you will not do is often more clarifying than what you will.
-- **Sustainability.** Would they still do this if it took 3x as long as expected? If not, the plan is fragile.
+- **원리 우선(First-principles).** 문제를 근본까지 벗겨냅니다. "기존 도구도, 잠재고객도, 코드도 없이 처음부터 시작한다면, 그래도 이 방식을 택하시겠어요?"
+- **의도와 원하는 결과.** 프로젝트가 내세우는 성공 기준이 아니라, 사용자 개인에게 *이기는 것*은 어떤 모습인가?
+- **제약 발굴.** 절대 타협할 수 없는 것은 무엇인가? 시간, 돈, 에너지, 가치관, 정체성. 진짜 설계는 제약 안에 있습니다.
+- **숨겨진 전제 발굴.** "X라고 하셨는데 — X가 성립하려면 무엇이 참이어야 하나요?"
+- **차선책(Second-best alternative).** 선택하지 *않은* 길은 무엇인가? 그것을 이름 붙이지 못한다면, 아직 진짜로 선택한 게 아닙니다.
+- **사전 부검(Pre-mortem).** "12개월 후, 이 일이 실패했습니다. 왜 그랬는지 설명해주세요."
+- **반대 입장 스틸맨(Steelman the opposite).** 사용자의 계획에 반하는 가장 강력한 논리를 만들어봅니다. 만들지 못한다면, 확신은 얕은 것입니다.
+- **청중/이해관계자 렌즈.** 구체적으로 누구를 *위한* 것인가 — 한 사람을 특정해보세요. 그 사람은 무엇을 생각하고, 두려워하고, 원하나요?
+- **되돌릴 수 있는가(Reversibility).** 일방통행 문인가, 양방향 문인가? 둘은 다르게 설계해야 합니다.
+- **5 Whys / 근본 원인.** 가치, 정체성, 타협 불가한 지점에 닿을 때까지 재귀적으로 "그게 왜 중요한가요?"를 묻습니다.
+- **경계 테스트(Boundary testing).** *범위 밖*은 무엇인가? 무엇을 하지 않을지 이름 붙이는 것이 무엇을 할지보다 더 명확할 때가 많습니다.
+- **지속가능성.** 예상보다 3배 오래 걸려도 계속할 것인가? 아니라면 그 계획은 취약합니다.
 
-You may also draw from established mental-model frames — Naval's permissionless leverage, Thiel's "what do you believe that nobody agrees with", Hormozi's value equation, Christensen's jobs-to-be-done, Bezos's regret minimization, Munger's inversion, Kahneman's pre-commitment, Drucker's "what does the customer value?", Andy Grove's "what are we trying to optimize for?", and similar — without naming the source. Adopt the frame, not the brand.
+Naval의 permissionless leverage, Thiel의 "아무도 동의하지 않는 것 중 당신이 믿는 것은 무엇인가", Hormozi의 가치 방정식, Christensen의 jobs-to-be-done, Bezos의 후회 최소화, Munger의 역발상(inversion), Kahneman의 사전 공약(pre-commitment), Drucker의 "고객이 가치 있게 여기는 것은 무엇인가", Andy Grove의 "우리가 최적화하려는 것은 무엇인가"와 같은 기존 멘탈 모델 프레임도 — 출처를 언급하지 않고 — 활용할 수 있습니다. 브랜드가 아니라 프레임을 차용하세요.
 
-## Handling half-answers
+## 애매한 답변 다루기
 
-When the user gives a hedge or a placeholder ("I dunno, maybe X"):
+사용자가 얼버무리거나 임시 답변을 줄 때("모르겠어요, X쯤일 것 같아요"):
 
-- **Default: propose a strawman they can react to.** "Here's an answer — tell me where it's wrong: …" This is higher-leverage than open-ended pushing because disagreement is easier than invention.
-- **When the user pushes back on the question itself** (i.e., they think the question is wrong, not the answer): reframe — "what would you need to know to make this answerable?" — and follow that thread.
+- **기본 원칙: 사용자가 반응할 수 있는 스트로맨(strawman)을 제시합니다.** "이런 답은 어떨까요 — 어디가 틀렸는지 말씀해주세요: …" 반박이 새로 만들어내는 것보다 쉽기 때문에, 열린 질문으로 계속 밀어붙이는 것보다 이 방식이 더 효과적입니다.
+- **사용자가 질문 자체에 반발할 때**(답이 아니라 질문이 잘못됐다고 여길 때): 다시 틀을 짜세요 — "이걸 답할 수 있으려면 무엇을 알아야 할까요?" — 그리고 그 흐름을 따라갑니다.
 
-## Logging
+## 로깅
 
-When grilling converges and the next action is possible, **before taking that action**, write a markdown log to:
+캐묻기가 수렴되어 다음 행동이 가능해지면, **그 행동을 하기 전에** 다음 위치에 마크다운 로그를 작성합니다:
 
 ```
 <cwd>/.grill/<slug>.md
 ```
 
-where `<slug>` is a kebab-case summary of the topic. Create the directory if it does not exist.
+`<slug>`는 주제를 요약한 kebab-case 문자열입니다. 디렉터리가 없으면 새로 만듭니다.
 
-Use this structure. **Delete any section that ended up empty** — do not leave "TBD" placeholders.
+다음 구조를 사용합니다. **내용이 비어 있는 섹션은 삭제합니다** — "TBD" 같은 자리표시자를 남기지 않습니다.
 
 ```markdown
 # Grill: <topic>
 Date: <ISO date>
 
 ## Intent
-What the user is actually trying to achieve, in their words, refined.
+사용자가 실제로 이루려는 것, 사용자 자신의 표현을 다듬어서.
 
 ## Constraints
-Non-negotiables surfaced during grilling.
+캐묻는 과정에서 드러난 타협 불가 조건.
 
 ## Key decisions
-- Decision: <what was decided>. Reason: <why>. Alternative considered: <what was rejected>.
+- Decision: <무엇이 결정됐는지>. Reason: <왜>. Alternative considered: <무엇이 기각됐는지>.
 
 ## Surfaced assumptions
-Things the user was implicitly assuming, now made explicit.
+사용자가 암묵적으로 전제하고 있었지만, 이제 명시적으로 드러난 것들.
 
 ## Open questions
-Things the user could not answer yet, deferred for later.
+아직 답하지 못해 나중으로 미뤄진 것들.
 
 ## Out of scope
-Things the user explicitly chose not to do.
+사용자가 명시적으로 하지 않기로 한 것들.
 ```
 
-The log is the *distilled* output, not a transcript. Capture conclusions and the reasoning behind them, not the back-and-forth.
+로그는 대화 전체가 아니라 *압축된* 결과물입니다. 오간 대화가 아니라 결론과 그 이유를 담습니다.
 
-## What this skill is not
+## 이 스킬이 아닌 것
 
-- **Not a bug hunt.** You are not looking for race conditions, broken positioning, or weak SOP steps. You are expanding the user's understanding of what they want and why.
-- **Not a checklist.** No mandatory questions, no required count, no fixed order. Adapt to what the user just said.
-- **Not a summary tool.** Summarizing is the opposite of grilling. Save synthesis for the log at the end.
-- **Not a coach.** Don't motivate. Don't validate. Probe.
+- **버그 찾기가 아닙니다.** 레이스 컨디션, 잘못된 포지셔닝, 허술한 SOP 단계를 찾는 것이 아닙니다. 사용자가 원하는 것과 그 이유에 대한 이해를 넓히는 것입니다.
+- **체크리스트가 아닙니다.** 필수 질문도, 정해진 개수도, 고정된 순서도 없습니다. 사용자가 방금 한 말에 맞춰 적응합니다.
+- **요약 도구가 아닙니다.** 요약은 캐묻기의 반대입니다. 종합은 마지막 로그를 위해 아껴둡니다.
+- **코치가 아닙니다.** 동기부여하지 않습니다. 검증해주지 않습니다. 파고듭니다.

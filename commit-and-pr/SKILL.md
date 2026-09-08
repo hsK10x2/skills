@@ -1,105 +1,102 @@
 ---
 name: commit-and-pr
 description: >-
-  Automates writing git commit messages and creating GitHub pull requests.
-  Inspects staged/unstaged changes, drafts a Conventional Commits message,
-  commits, pushes to a feature branch, and opens a PR (via the `gh` CLI) with
-  a structured Summary / Changes / Test Plan description. Use this skill when
-  the user asks to commit changes, write a commit message, open/create a PR
-  or pull request, "커밋해줘", "커밋 메시지 써줘", "PR 만들어줘", "풀리퀘스트 올려줘",
-  ship a branch, or wrap up a change for review.
+  Git 커밋 메시지 작성과 GitHub Pull Request 생성을 자동화합니다.
+  스테이징/비스테이징 변경사항을 검사하고 Conventional Commits 메시지를 작성한 뒤,
+  커밋하고 기능 브랜치로 푸시하며, `gh` CLI로 Summary/Changes/Test Plan을 갖춘
+  구조화된 PR을 엽니다. 사용자가 변경사항 커밋, 커밋 메시지 작성, PR 열기/생성,
+  "커밋해줘", "커밋 메시지 써줘", "PR 만들어줘", "풀리퀘스트 올려줘", 브랜치 배포,
+  리뷰를 위한 변경사항 마무리를 요청할 때 사용합니다.
 ---
 
-# Commit & PR Automation
+# Commit & PR 자동화
 
-Turns a working-tree diff into a clean commit and, optionally, a ready-to-review
-GitHub pull request — without the user having to dictate commit-message wording
-or PR boilerplate each time.
+작업 트리의 변경사항(diff)을 깔끔한 커밋으로, 필요하면 바로 리뷰 가능한 GitHub Pull
+Request로 변환합니다 — 매번 사용자가 커밋 메시지 문구나 PR 상투문을 직접 불러줄
+필요가 없습니다.
 
-## When to use this skill
+## 이 스킬을 언제 쓰는가
 
-- User asks to commit their changes ("커밋해줘", "commit this", "얘 커밋 좀")
-- User asks for a commit message only ("커밋 메시지 뭐라고 쓸까")
-- User asks to open a PR ("PR 만들어줘", "pull request 올려줘", "ship this")
-- User asks to do both in one go ("커밋하고 PR까지 올려줘")
+- 사용자가 변경사항 커밋을 요청할 때 ("커밋해줘", "commit this", "얘 커밋 좀")
+- 사용자가 커밋 메시지만 요청할 때 ("커밋 메시지 뭐라고 쓸까")
+- 사용자가 PR 오픈을 요청할 때 ("PR 만들어줘", "pull request 올려줘", "ship this")
+- 사용자가 커밋과 PR을 한 번에 요청할 때 ("커밋하고 PR까지 올려줘")
 
-Do **not** use this skill just to explain what `git commit` does, or for
-read-only history questions (`git log`, `git blame`) — those need no
-automation.
+`git commit`이 무엇을 하는지 설명하기 위해서나, 읽기 전용 히스토리 질문(`git log`,
+`git blame`)에는 이 스킬을 사용하지 **않습니다** — 자동화가 필요 없는 경우입니다.
 
-## Preconditions — check before doing anything
+## 전제 조건 — 작업 전에 반드시 확인
 
-1. Confirm this is a git repo: `git rev-parse --is-inside-work-tree`. If not,
-   stop and tell the user.
-2. Confirm `gh` is available and authenticated if a PR is requested:
-   `gh auth status`. If not authenticated, stop and tell the user to run
-   `gh auth login` — do not attempt to log in on their behalf.
-3. Run `git status --porcelain` and `git branch --show-current`.
-   - If there is nothing to commit, say so and stop.
-   - If the current branch is the repo's default branch (`main`/`master`, or
-     whatever `git symbolic-ref refs/remotes/origin/HEAD` resolves to),
-     **do not commit directly on it**. Create a new branch first
-     (`git checkout -b <type>/<short-slug>`) unless the user explicitly says
-     to commit on the default branch.
+1. git 저장소인지 확인: `git rev-parse --is-inside-work-tree`. 아니라면 멈추고
+   사용자에게 알립니다.
+2. PR이 요청된 경우 `gh`가 설치되어 있고 인증되어 있는지 확인:
+   `gh auth status`. 인증되어 있지 않다면 멈추고 사용자에게 `gh auth login`을
+   실행하라고 안내합니다 — 대신 로그인을 시도하지 않습니다.
+3. `git status --porcelain`과 `git branch --show-current`를 실행합니다.
+   - 커밋할 것이 없다면 그렇게 알리고 멈춥니다.
+   - 현재 브랜치가 저장소의 기본 브랜치(`main`/`master`, 또는
+     `git symbolic-ref refs/remotes/origin/HEAD`가 가리키는 브랜치)라면
+     **그 브랜치에 직접 커밋하지 않습니다**. 사용자가 명시적으로 기본 브랜치에
+     커밋하라고 하지 않는 한, 먼저 새 브랜치를 만듭니다
+     (`git checkout -b <type>/<short-slug>`).
 
-## Step 1 — Understand the diff
+## 1단계 — Diff 파악하기
 
 ```bash
 git status
-git diff            # unstaged
-git diff --staged   # staged
+git diff            # 비스테이징
+git diff --staged   # 스테이징
 ```
 
-- If nothing is staged and the user didn't specify which files, ask whether
-  to stage everything (`git add -A`) or only specific files — don't guess on
-  a repo with unrelated in-flight changes.
-- Read enough of the diff to describe *why* the change was made, not just
-  *what* changed. If the intent isn't obvious from the diff alone (e.g. a
-  one-line config flip), ask the user rather than inventing a rationale.
+- 스테이징된 것이 없고 사용자가 어떤 파일인지 지정하지 않았다면, 전체를
+  스테이징할지(`git add -A`) 특정 파일만 할지 물어봅니다 — 관련 없는
+  변경사항이 섞여 있는 저장소에서는 임의로 판단하지 않습니다.
+- 변경사항이 *무엇*을 바꿨는지뿐 아니라 *왜* 바뀌었는지 설명할 수 있을
+  만큼 diff를 읽습니다. diff만으로 의도가 명확하지 않다면(예: 한 줄짜리
+  설정값 변경) 근거를 지어내지 말고 사용자에게 물어봅니다.
 
-## Step 2 — Write the commit message
+## 2단계 — 커밋 메시지 작성
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+[Conventional Commits](https://www.conventionalcommits.org/) 형식을 사용합니다:
 
 ```
-<type>(<scope>): <short imperative summary, ≤72 chars>
+<type>(<scope>): <72자 이내의 짧은 명령형 요약>
 
-<body: why this change, not a restatement of the diff — wrap ~72 cols>
+<본문: 이 변경이 왜 필요한지 — diff를 다시 설명하는 게 아니라. 약 72열에서 줄바꿈>
 
-<optional footer: BREAKING CHANGE:, Fixes #123, refs>
+<선택적 푸터: BREAKING CHANGE:, Fixes #123, refs>
 ```
 
-Type reference:
+타입 참고표:
 
-| type       | use for                                              |
+| 타입       | 사용 시점                                              |
 |------------|-------------------------------------------------------|
-| `feat`     | new user-facing capability                             |
-| `fix`      | bug fix                                                 |
-| `docs`     | documentation only                                      |
-| `refactor` | code change that's neither a fix nor a feature          |
-| `test`     | adding or fixing tests only                             |
-| `chore`    | tooling, deps, build config, no source behavior change  |
-| `style`    | formatting only, no logic change                        |
-| `perf`     | performance improvement                                 |
+| `feat`     | 사용자에게 보이는 새 기능                               |
+| `fix`      | 버그 수정                                               |
+| `docs`     | 문서만 변경                                             |
+| `refactor` | 수정도 기능 추가도 아닌 코드 변경                        |
+| `test`     | 테스트 추가/수정만                                      |
+| `chore`    | 툴링, 의존성, 빌드 설정 — 소스 동작 변경 없음            |
+| `style`    | 포맷팅만, 로직 변경 없음                                |
+| `perf`     | 성능 개선                                               |
 
-Rules:
-- Summary line: imperative mood ("add", not "added"/"adds"), no trailing period.
-- Skip the type prefix only if the repo's existing `git log` history clearly
-  doesn't use Conventional Commits — match the repo's actual convention,
-  don't impose one.
-- If the diff mixes clearly unrelated changes, tell the user and suggest
-  splitting into separate commits rather than writing one message that tries
-  to cover both.
-- Never invent a ticket/issue number — only add `Fixes #N` if the user gave one.
-- Append whatever commit-message attribution footer this session's own
-  instructions specify (Claude Code appends a `Co-Authored-By:` / session-link
-  footer automatically) — don't drop it just because this skill's template
-  above doesn't show it.
+규칙:
+- 요약 줄: 명령형("add", "added"/"adds"가 아님)으로 쓰고, 마침표를 붙이지 않습니다.
+- 저장소의 기존 `git log` 히스토리가 Conventional Commits를 명백히 쓰지 않는
+  경우에만 타입 접두사를 생략합니다 — 새 규칙을 강요하지 말고 저장소의
+  실제 관례를 따릅니다.
+- diff에 명백히 무관한 변경사항이 섞여 있다면, 하나의 메시지로 둘 다
+  아우르려 하지 말고 사용자에게 알려 커밋을 분리하도록 제안합니다.
+- 티켓/이슈 번호를 지어내지 않습니다 — 사용자가 직접 알려준 경우에만
+  `Fixes #N`을 추가합니다.
+- 이 세션 자체의 지침이 지정한 커밋 메시지 어트리뷰션 푸터를 그대로
+  덧붙입니다(Claude Code는 `Co-Authored-By:` / 세션 링크 푸터를 자동으로
+  덧붙입니다) — 위 템플릿에 나와 있지 않다고 해서 빼지 않습니다.
 
-## Step 3 — Commit
+## 3단계 — 커밋
 
 ```bash
-git add -A            # or the specific files agreed in Step 1
+git add -A            # 또는 1단계에서 합의한 특정 파일들
 git commit -m "$(cat <<'EOF'
 <type>(<scope>): <summary>
 
@@ -108,57 +105,59 @@ EOF
 )"
 ```
 
-- Never use `--no-verify` / skip hooks unless the user explicitly says to.
-- If a pre-commit hook fails, fix the underlying issue (or report it) —
-  don't bypass it.
-- Never `git commit --amend` on a commit that's already been pushed/shared
-  unless the user explicitly asks.
+- 사용자가 명시적으로 요청하지 않는 한 `--no-verify`로 훅을 건너뛰지
+  않습니다.
+- pre-commit 훅이 실패하면 근본 원인을 고치거나(혹은 보고하거나) 합니다 —
+  우회하지 않습니다.
+- 이미 푸시/공유된 커밋에는 사용자가 명시적으로 요청하지 않는 한
+  `git commit --amend`를 사용하지 않습니다.
 
-## Step 4 — Push
+## 4단계 — 푸시
 
 ```bash
 git push -u origin <branch-name>
 ```
 
-- Never `--force` (or `--force-with-lease`) without the user explicitly
-  asking for it, and only after confirming no one else's work would be
-  clobbered.
+- 사용자가 명시적으로 요청하지 않는 한, 그리고 다른 사람의 작업을
+  덮어쓰지 않는다는 것을 확인하지 않는 한 `--force`(또는
+  `--force-with-lease`)를 사용하지 않습니다.
 
-## Step 5 — Open the PR (only if the user asked for a PR)
+## 5단계 — PR 열기 (사용자가 PR을 요청한 경우만)
 
 ```bash
-gh pr create --title "<same summary as commit, or a slightly fuller title>" --body "$(cat <<'EOF'
+gh pr create --title "<커밋과 동일하거나 조금 더 풍부한 제목>" --body "$(cat <<'EOF'
 ## Summary
-- <1-3 bullets: what changed and why, for a reviewer skimming>
+- <리뷰어가 훑어볼 수 있는 1~3개 불릿: 무엇이, 왜 바뀌었는지>
 
 ## Changes
-- <notable files/areas touched, grouped logically>
+- <논리적으로 묶은, 주목할 만한 변경 파일/영역>
 
 ## Test Plan
-- <how this was verified: tests run, manual steps, or "N/A" with a reason>
+- <어떻게 검증했는지: 실행한 테스트, 수동 확인 절차, 또는 이유를 밝힌 "N/A">
 EOF
 )"
 ```
 
-- Base branch: default to the repo's default branch unless the user names
-  another target.
-- If the branch already has an open PR, update it (`gh pr edit`) instead of
-  creating a duplicate — check with `gh pr list --head <branch>` first.
-- Draft PRs: pass `--draft` if the user says the work is WIP / not ready for
-  review.
-- After creation, hand back the PR URL from `gh pr create`'s output — don't
-  reconstruct it manually.
-- Never merge the PR yourself (`gh pr merge`) unless the user explicitly asks.
-- Append whatever PR-body attribution footer this session's own instructions
-  specify (Claude Code appends a "Generated with Claude Code" footer
-  automatically).
+- 베이스 브랜치: 사용자가 다른 대상을 지정하지 않는 한 저장소의 기본
+  브랜치를 기본값으로 합니다.
+- 해당 브랜치에 이미 열린 PR이 있다면, 중복 생성 대신 업데이트합니다
+  (`gh pr edit`) — 먼저 `gh pr list --head <branch>`로 확인합니다.
+- Draft PR: 작업이 미완성/리뷰 준비가 안 됐다고 사용자가 말하면 `--draft`를
+  붙입니다.
+- 생성 후에는 `gh pr create`의 출력에서 PR URL을 그대로 전달합니다 — 직접
+  조립하지 않습니다.
+- 사용자가 명시적으로 요청하지 않는 한 PR을 직접 머지(`gh pr merge`)하지
+  않습니다.
+- 이 세션 자체의 지침이 지정한 PR 본문 어트리뷰션 푸터를 그대로
+  덧붙입니다(Claude Code는 "Generated with Claude Code" 푸터를 자동으로
+  덧붙입니다).
 
-## Guardrails
+## 안전장치
 
-- Ask before any destructive or hard-to-reverse step (force-push, amending a
-  pushed commit, merging, committing directly to the default branch) unless
-  the user has already authorized it for this session.
-- If `git diff` shows secrets/credentials being added, stop and flag it
-  instead of committing.
-- Keep the commit message and PR description honest about what was actually
-  tested — don't claim a test plan that wasn't run.
+- 위험하거나 되돌리기 어려운 작업(force-push, 이미 푸시된 커밋의 amend,
+  머지, 기본 브랜치에 직접 커밋) 전에는, 이번 세션에서 사용자가 이미
+  승인한 경우가 아니라면 반드시 먼저 물어봅니다.
+- `git diff`에 시크릿/자격증명이 추가되는 것이 보이면, 커밋 대신 멈추고
+  이를 알립니다.
+- 커밋 메시지와 PR 설명은 실제로 무엇을 테스트했는지 정직하게 기록합니다
+  — 실행하지 않은 테스트 계획을 있는 것처럼 주장하지 않습니다.
