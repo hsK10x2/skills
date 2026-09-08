@@ -24,7 +24,7 @@ tested with **Claude Code**; also compatible with **Google Antigravity**.
 your skills directory:
 
 ```bash
-git clone https://github.com/<your-username>/commit-and-pr /tmp/commit-and-pr
+git clone https://github.com/hsK10x2/commit-and-pr /tmp/commit-and-pr
 
 # per-user (all projects)
 cp -r /tmp/commit-and-pr/commit-and-pr ~/.claude/skills/commit-and-pr
