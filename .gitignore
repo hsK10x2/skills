@@ -1,0 +1,8 @@
+# This repo only tracks the commit-and-pr skill.
+# Everything else in ~/.claude/skills is a separately-managed/bundled skill.
+*
+!commit-and-pr/
+!commit-and-pr/**
+!README.md
+!LICENSE
+!.gitignore
