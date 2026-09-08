@@ -8,7 +8,7 @@ skill 시각화 https://claude.ai/code/artifact/40113156-89fe-4b69-9f90-0fa6360e
 
 ---
 
-## 📦 포함된 스킬
+## 포함된 스킬
 
 | 스킬 | 설명 | 트리거 |
 | :--- | :--- | :--- |
@@ -18,7 +18,7 @@ skill 시각화 https://claude.ai/code/artifact/40113156-89fe-4b69-9f90-0fa6360e
 
 ---
 
-## 🚀 설치 방법
+## 설치 방법
 
 오픈 Agent Skills 표준(`SKILL.md`)을 지원하는 모든 AI 에이전트에서 동작합니다.
 
