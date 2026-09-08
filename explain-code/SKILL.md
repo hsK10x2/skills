@@ -1,7 +1,7 @@
 ---
 name: explain-code
 description: >-
-  Writes a companion Markdown explanation file for code AI just wrote or any existing file/directory.
+  코드 분석 및 초보 개발자용 학습/유지보수 설명서(MD) 생성. Writes a companion Markdown explanation file for code AI just wrote or any existing file/directory.
   Optimized for junior/beginner developers to study and maintain code independently.
   Focuses on high information density, concrete code mapping, core CS/architecture concepts,
   professional engineering terminology, and zero-fluff token efficiency.
