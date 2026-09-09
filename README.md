@@ -15,6 +15,7 @@ skill 시각화 https://claude.ai/code/artifact/40113156-89fe-4b69-9f90-0fa6360e
 | **[`commit-and-pr`](./commit-and-pr)** | 작업 트리 변경사항을 검사하고 Conventional Commits 메시지를 작성한 뒤 커밋·푸시하고, `gh`로 GitHub PR을 엽니다. | `/commit-and-pr`, `커밋해줘`, `PR 만들어줘`, `commit this and open a PR` |
 | **[`explain-code`](./explain-code)** | 코드 학습과 유지보수를 위한 고밀도의 주니어 개발자 친화적 마크다운 설명 문서(`<file>.explain.md` / `EXPLAIN.md`)를 생성합니다. | `/explain-code`, `이 코드 설명해줘`, `코드 설명 md 만들어줘`, `explain this code` |
 | **[`grill-me`](./grill-me)** | 집요한 질문으로 사용자와의 맥락을 확장하고, 제약을 발굴하며, 숨겨진 전제에 의문을 제기하고, 압축된 결정 로그(`.grill/<slug>.md`)를 생성합니다. | `/grill-me`, `grill me`, `interview me`, `질문해줘`, `인터뷰해줘`, `의도 구체화해줘`, `아이디어 검증해줘` |
+| **[`how-many-tokens-left`](./how-many-tokens-left)** | 사전 토큰 게이트키퍼. 세션의 남은 컨텍스트를 측정하고 요청한 작업의 소모량을 예측하여, 도중에 소진될 가능성이 높으면 작업을 시작하지 않고 사용자에게 확인을 받습니다. Claude Code(API `usage` 기반 실측)와 Google Antigravity(트랜스크립트 크기 기반 추정)를 지원합니다. | `/how-many-tokens-left`, `토큰 얼마나 남았어`, `이 작업 토큰 될까`, `토큰 확인`, `how many tokens left` |
 
 ---
 
@@ -33,6 +34,7 @@ git clone https://github.com/hsK10x2/skills.git /tmp/my-skills
 cp -r /tmp/my-skills/commit-and-pr ~/.claude/skills/
 cp -r /tmp/my-skills/explain-code ~/.claude/skills/
 cp -r /tmp/my-skills/grill-me ~/.claude/skills/
+cp -r /tmp/my-skills/how-many-tokens-left ~/.claude/skills/
 
 # 또는 특정 프로젝트에만 설치
 cp -r /tmp/my-skills/<skill-name> <project>/.claude/skills/
@@ -77,6 +79,13 @@ Antigravity는 다음 턴 또는 세션에서 스킬을 자동으로 감지하�
 - **다각도 렌즈**: 원리 우선 분석(First-principles), 사전 부검(Pre-mortem), 반대 입장 스틸맨(Steelman opposite), 5 Whys, 되돌릴 수 있는지 여부(Reversibility), 경계 테스트(Boundary testing)를 활용합니다.
 - **실행 지향적 수렴**: 다음 구체적 단계(코드 작성, 문서 초안, 아키텍처 설계)가 준비되면 마무리합니다.
 - **압축된 세션 로그**: `.grill/<slug>.md`에 다듬어진 의도, 절대 타협 불가 제약, 핵심 결정(고려한 대안 포함), 전제, 미해결 질문, 범위 외 항목을 요약한 마크다운 보고서를 자동 생성합니다.
+
+### 4. `how-many-tokens-left`
+- **측정(Measure)**: 현재 세션의 컨텍스트 사용량을 읽습니다. Claude Code는 API `usage` 레코드를 파싱한 실측값이고, Google Antigravity는 토큰 사용량을 로컬에 기록하지 않으므로 트랜스크립트 크기에서 역산한 추정값입니다.
+- **예측(Estimate)**: 요청한 작업을 복잡도 매트릭스(읽을 파일 수, 도구 호출 횟수, 생성할 응답량)에 대입해 `최소 ~ 최대` 토큰 범위를 산출합니다.
+- **게이트(Gate)**: 예상 소모량이 남은 예산을 넘기면 작업을 시작하지 않고 네 가지 선택지(그대로 진행, 컨텍스트 압축 후 진행, 작업 분할, 취소)를 제시합니다.
+- **정직한 정확도 보고**: 그 수치가 실측인지 추정(오차 ±30%)인지 항상 함께 밝혀, 추정치를 실측값처럼 제시하지 않습니다.
+- **의존성 없음**: `scripts/hmtl.py`는 Python 표준 라이브러리만 사용합니다.
 
 ---
 
